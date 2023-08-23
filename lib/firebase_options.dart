@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,11 +43,41 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDPykDLTcDfCOBgPHrX0hJKUQq7qhSxz78',
+    appId: '1:466382242920:web:70427e026176a3b3ee67dd',
+    messagingSenderId: '466382242920',
+    projectId: 'melloss-chat-ef44f',
+    authDomain: 'melloss-chat-ef44f.firebaseapp.com',
+    storageBucket: 'melloss-chat-ef44f.appspot.com',
+    measurementId: 'G-BFSDRC4VF3',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDMdKGPHgk5590D16TlRwKtIqN6CkuByvc',
     appId: '1:466382242920:android:e5708e3b6da5df67ee67dd',
     messagingSenderId: '466382242920',
     projectId: 'melloss-chat-ef44f',
     storageBucket: 'melloss-chat-ef44f.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyD1B_R037DbMSFVo4A3ukkeKuDJcllHuYQ',
+    appId: '1:466382242920:ios:3efce570ac63b14fee67dd',
+    messagingSenderId: '466382242920',
+    projectId: 'melloss-chat-ef44f',
+    storageBucket: 'melloss-chat-ef44f.appspot.com',
+    iosClientId: '466382242920-1uhr70jchdf98ecjshs9o9prpqftq07u.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mellossChatApp',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD1B_R037DbMSFVo4A3ukkeKuDJcllHuYQ',
+    appId: '1:466382242920:ios:3efce570ac63b14fee67dd',
+    messagingSenderId: '466382242920',
+    projectId: 'melloss-chat-ef44f',
+    storageBucket: 'melloss-chat-ef44f.appspot.com',
+    iosClientId: '466382242920-1uhr70jchdf98ecjshs9o9prpqftq07u.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mellossChatApp',
   );
 }

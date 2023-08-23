@@ -5,7 +5,8 @@ buildTextField(
     {bool obscure = false,
     @required Function(String value)? onChanged,
     TextAlign? textAlign,
-    TextInputType? keyboardType}) {
+    TextInputType? keyboardType,
+    Widget? suffix}) {
   return Container(
     margin: const EdgeInsets.only(top: 15),
     width: MediaQuery.of(context).size.width * 0.90,
@@ -21,6 +22,7 @@ buildTextField(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
         ),
+        suffixIcon: suffix,
       ),
     ),
   );

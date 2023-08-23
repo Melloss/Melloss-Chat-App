@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'chat.dart';
 import './register.dart';
 import '../widgets/circular_button.dart';
@@ -20,8 +21,9 @@ class _WelcomeState extends State<Welcome> {
   final passwordController = TextEditingController();
   bool isValid = false;
   bool showLoading = false;
+  bool showPassword = false;
+  bool showEye = false;
   final _auth = FirebaseAuth.instance;
-
   void checkValid() {
     if (emailController.text.isNotEmpty &&
         emailController.text.isEmail &&
@@ -47,6 +49,7 @@ class _WelcomeState extends State<Welcome> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          leading: const SizedBox.shrink(),
           systemOverlayStyle: const SystemUiOverlayStyle(
             statusBarColor: Colors.transparent,
           ),
@@ -78,9 +81,32 @@ class _WelcomeState extends State<Welcome> {
                 checkValid();
               }, keyboardType: TextInputType.emailAddress),
               buildTextField(context, passwordController, "Password...",
-                  obscure: true, onChanged: (value) {
+                  obscure: showPassword ? false : true, onChanged: (value) {
+                if (value.isNotEmpty) {
+                  setState(() {
+                    showEye = true;
+                  });
+                } else {
+                  setState(() {
+                    showEye = false;
+                  });
+                }
                 checkValid();
-              }),
+              },
+                  suffix: showEye
+                      ? IconButton(
+                          onPressed: () {
+                            setState(() {
+                              showPassword = !showPassword;
+                            });
+                          },
+                          icon: Icon(
+                            showPassword == true
+                                ? Icons.remove_red_eye
+                                : Icons.remove_red_eye_outlined,
+                            size: 20,
+                          ))
+                      : const SizedBox.shrink()),
               const SizedBox(height: 20),
               showLoading
                   ? const CircularProgressIndicator.adaptive()
@@ -98,6 +124,9 @@ class _WelcomeState extends State<Welcome> {
                                         email: emailController.text,
                                         password: passwordController.text);
                                 if (!user.user.isBlank!) {
+                                  final pref =
+                                      await SharedPreferences.getInstance();
+                                  pref.setBool('isLoggedBefore', true);
                                   Get.to(() => const Chat());
                                 }
                                 emailController.text = '';

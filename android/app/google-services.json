@@ -31,10 +31,10 @@
               "client_type": 3
             },
             {
-              "client_id": "466382242920-rajnvpgmcivcpibrcfvu4l1aigs6cddg.apps.googleusercontent.com",
+              "client_id": "466382242920-1uhr70jchdf98ecjshs9o9prpqftq07u.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.mellossChat"
+                "bundle_id": "com.example.mellossChatApp"
               }
             }
           ]
@@ -67,10 +67,10 @@
               "client_type": 3
             },
             {
-              "client_id": "466382242920-rajnvpgmcivcpibrcfvu4l1aigs6cddg.apps.googleusercontent.com",
+              "client_id": "466382242920-1uhr70jchdf98ecjshs9o9prpqftq07u.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.mellossChat"
+                "bundle_id": "com.example.mellossChatApp"
               }
             }
           ]

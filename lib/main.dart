@@ -1,16 +1,19 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import './screens/intro.dart';
+import './controller/uiController.dart';
 import 'firebase_options.dart';
-import 'screens/welcome.dart';
 import 'package:get/get.dart';
 
+final uiController = Get.put(UIController());
+
 class App extends StatelessWidget {
-  const App({super.key});
+  App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      home: const Welcome(),
+      home: const Intro(),
       theme: ThemeData(
           appBarTheme: AppBarTheme(
         iconTheme: const IconThemeData(color: Colors.black54),
@@ -26,5 +29,5 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const App());
+  runApp(App());
 }

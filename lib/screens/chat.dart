@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:melloss_chat_app/widgets/circular_button.dart';
+import 'package:melloss_chat_app/screens/welcome.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/chat_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../controller/uiController.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -16,8 +18,9 @@ class _ChatState extends State<Chat> {
   final _auth = FirebaseAuth.instance;
   final _fireStore = FirebaseFirestore.instance;
   late User loggedInUser;
-  final key = GlobalKey<ScaffoldState>();
   final sendController = TextEditingController();
+  bool isSending = false;
+  final uiController = Get.put(UIController());
 
   @override
   void initState() {
@@ -54,110 +57,30 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: key,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_outlined,
-              size: 20,
-            ),
-            onPressed: () {
-              Get.back();
-            },
-          ),
-          centerTitle: true,
-          title: const Text("Melloss Chat",
-              style: TextStyle(color: Colors.black54)),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: IconButton(
-                onPressed: () {
-                  key.currentState?.openEndDrawer();
-                },
-                icon: const Icon(Icons.person_3_rounded),
-              ),
-            ),
+      appBar: AppBar(
+        leading: const SizedBox.shrink(),
+        centerTitle: true,
+        title:
+            const Text("Melloss Chat", style: TextStyle(color: Colors.black54)),
+        actions: [
+          _buildLogout(),
+        ],
+      ),
+      body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: Column(
+          children: [
+            _buildStreamBuilder(),
+            _buildChatTextField(),
           ],
         ),
-        endDrawer: _buildEndDrawer(),
-        body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
-          child: Column(
-            children: [
-              _buildStreamBuilder(),
-              Container(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: TextField(
-                    controller: sendController,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      hintText: 'Say Hello to Melloss',
-                      suffixIcon: IconButton(
-                        icon: const Icon(
-                          Icons.send,
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                        onPressed: () async {
-                          Map<String, dynamic> message = {
-                            'text': sendController.text,
-                            'sender': loggedInUser.email,
-                          };
-                          await _fireStore.collection('messages').add(message);
-                          sendController.text = '';
-                        },
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ));
-  }
-
-  _buildEndDrawer() {
-    return Drawer(
-      width: MediaQuery.of(context).size.width * 0.7,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          const SizedBox(height: 50),
-          const Center(
-              child: Text(
-            'Account Info',
-            textScaleFactor: 1.5,
-          )),
-          const SizedBox(height: 20),
-          Text(
-            loggedInUser.email!,
-            style: const TextStyle(
-              fontSize: 20,
-            ),
-          ),
-          buildCircularButton(
-            Colors.blueAccent,
-            'Log Out',
-            () async {
-              await _auth.signOut();
-              Get.back();
-              Get.back();
-            },
-          ),
-        ],
       ),
     );
   }
 
   _buildStreamBuilder() {
-    return StreamBuilder(
-        stream: _fireStore.collection('messages').snapshots(),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: _fireStore.collection('messages').orderBy('time').snapshots(),
         builder: ((context, snapshot) {
           if (snapshot.hasData) {
             final messages = snapshot.data!.docs.reversed;
@@ -167,18 +90,123 @@ class _ChatState extends State<Chat> {
               final messageSender = message.data()['sender'];
               messageBubbles.add(
                 ChatBubble(
-                    text: messageText,
-                    isRight: messageSender == loggedInUser.email),
+                  id: message.id,
+                  text: messageText,
+                  isMe: messageSender == loggedInUser.email,
+                  sender: messageSender,
+                  time: message.data()['time'],
+                ),
               );
             }
+
             return Expanded(
                 child: ListView(
               reverse: true,
               children: messageBubbles,
             ));
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return const Expanded(
+                child: Center(child: CircularProgressIndicator()));
           }
         }));
+  }
+
+  _buildChatTextField() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: TextField(
+        onChanged: (text) {
+          if (text.isEmpty) {
+            setState(() {
+              isSending = false;
+            });
+          }
+        },
+        controller: sendController,
+        textAlignVertical: TextAlignVertical.center,
+        decoration: InputDecoration(
+          hintText: 'Message',
+          suffixIcon: IconButton(
+            icon: isSending == true
+                ? const SizedBox(
+                    width: 30,
+                    height: 30,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                    ),
+                  )
+                : const Icon(
+                    Icons.send,
+                    color: Colors.blue,
+                    size: 25,
+                  ),
+            onPressed: () async {
+              if (sendController.text.isNotEmpty) {
+                setState(() {
+                  isSending = true;
+                });
+                Map<String, dynamic> message = {
+                  'text': sendController.text,
+                  'sender': loggedInUser.email,
+                  'time': DateTime.now(),
+                };
+                await _fireStore
+                    .collection('messages')
+                    .add(message)
+                    .whenComplete(() {
+                  sendController.text = '';
+                  setState(() {
+                    isSending = false;
+                  });
+                }).catchError((error) {
+                  setState(() {
+                    isSending = false;
+                  });
+                });
+              }
+            },
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      ),
+    );
+  }
+
+  _buildLogout() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: IconButton(
+        onPressed: () {
+          Get.dialog(AlertDialog(
+            title: const Center(child: Text('Logout')),
+            content: const Text('Do you want to Logout?'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Get.back();
+                  },
+                  child: const Text('Cancel')),
+              TextButton(
+                  onPressed: () async {
+                    final pref = await SharedPreferences.getInstance();
+                    pref.setBool('isLoggedBefore', false);
+                    await _auth.signOut();
+                    Get.to(() => const Welcome());
+                  },
+                  child: const Text(
+                    'Yes',
+                    style: TextStyle(color: Colors.red),
+                  ))
+            ],
+          ));
+        },
+        icon: const Icon(
+          Icons.logout,
+          size: 20,
+        ),
+      ),
+    );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:melloss_chat_app/screens/chat.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/circular_button.dart';
 import '../widgets/text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -28,7 +29,17 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_outlined,
+            size: 20,
+          ),
+          onPressed: () {
+            Get.back();
+          },
+        ),
+      ),
       body: SizedBox(
         width: double.infinity,
         child: Column(
@@ -58,6 +69,8 @@ class _RegisterState extends State<Register> {
                             await _auth.createUserWithEmailAndPassword(
                                 email: email, password: password);
                         if (newUser.additionalUserInfo!.isNewUser) {
+                          final pref = await SharedPreferences.getInstance();
+                          pref.setBool('isLoggedBefore', true);
                           Get.to(() => const Chat());
                           emailController.text = '';
                           passwordController.text = '';
