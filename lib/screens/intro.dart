@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import './welcome.dart';
 import '../controller/uiController.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'dart:async';
-
-import 'chat.dart';
 
 class Intro extends StatefulWidget {
   const Intro({super.key});
@@ -22,9 +19,9 @@ class _IntroState extends State<Intro> {
     uiController.initSettings();
     Timer(const Duration(seconds: 6), () {
       if (uiController.isLoggedBefore.value == true) {
-        Get.to(() => const Chat());
+        Get.offNamed('/chat');
       } else {
-        Get.to(() => const Welcome());
+        Get.offNamed('/welcome');
       }
     });
     super.initState();
@@ -39,6 +36,7 @@ class _IntroState extends State<Intro> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,

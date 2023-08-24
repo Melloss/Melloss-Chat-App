@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:melloss_chat_app/screens/welcome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/chat_bubble.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -193,7 +192,8 @@ class _ChatState extends State<Chat> {
                     final pref = await SharedPreferences.getInstance();
                     pref.setBool('isLoggedBefore', false);
                     await _auth.signOut();
-                    Get.to(() => const Welcome());
+                    Get.back();
+                    Get.offNamed('/welcome');
                   },
                   child: const Text(
                     'Yes',

@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'chat.dart';
-import './register.dart';
 import '../widgets/circular_button.dart';
 import '../widgets/text_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -50,9 +47,20 @@ class _WelcomeState extends State<Welcome> {
     return Scaffold(
         appBar: AppBar(
           leading: const SizedBox.shrink(),
-          systemOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-          ),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10.0, right: 5),
+              child: IconButton(
+                  onPressed: () {
+                    Get.toNamed('/about', preventDuplicates: true);
+                  },
+                  icon: const Icon(
+                    Icons.info_outline,
+                    size: 25,
+                    color: Colors.black38,
+                  )),
+            ),
+          ],
         ),
         body: SizedBox(
           width: double.infinity,
@@ -127,10 +135,23 @@ class _WelcomeState extends State<Welcome> {
                                   final pref =
                                       await SharedPreferences.getInstance();
                                   pref.setBool('isLoggedBefore', true);
-                                  Get.to(() => const Chat());
+                                  Get.offNamed('/chat');
                                 }
                                 emailController.text = '';
                                 passwordController.text = '';
+                                setState(() {
+                                  showLoading = false;
+                                });
+                              } on FirebaseException catch (e) {
+                                Get.snackbar(
+                                  'Error',
+                                  e.message!,
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  colorText: Colors.white,
+                                  backgroundColor: Colors.black54,
+                                  margin: const EdgeInsets.all(10),
+                                  duration: const Duration(seconds: 3),
+                                );
                                 setState(() {
                                   showLoading = false;
                                 });
@@ -146,7 +167,6 @@ class _WelcomeState extends State<Welcome> {
                                 );
                                 setState(() {
                                   showLoading = false;
-                                  isValid = false;
                                 });
                               }
                             }
@@ -155,9 +175,7 @@ class _WelcomeState extends State<Welcome> {
                 visible: !showLoading,
                 child:
                     buildCircularButton(Colors.lightBlueAccent, "Register", () {
-                  Get.to(
-                    () => const Register(),
-                  );
+                  Get.toNamed('/register');
                 }),
               ),
             ],

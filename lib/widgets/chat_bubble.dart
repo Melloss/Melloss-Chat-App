@@ -50,7 +50,7 @@ class _ChatBubbleState extends State<ChatBubble> {
       default:
         day = 'Sunday';
     }
-    int hour = date.hour >= 12
+    int hour = date.hour > 12
         ? date.hour - 11
         : date.hour == 0
             ? 12
@@ -140,17 +140,22 @@ class _ChatBubbleState extends State<ChatBubble> {
                     child: Text(
                       widget.text,
                       style: const TextStyle(
-                        fontFamily: 'roboto',
                         color: Colors.white,
                         fontSize: 16,
                       ),
                     ),
                   ),
-                  Text(
-                    getTime(),
-                    style: TextStyle(
-                      color: Colors.black.withOpacity(0.5),
-                      fontSize: 7,
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: 3,
+                        right: widget.isMe ? 8 : 0,
+                        left: widget.isMe ? 0 : 8),
+                    child: Text(
+                      getTime(),
+                      style: TextStyle(
+                        color: Colors.black.withOpacity(0.5),
+                        fontSize: 7,
+                      ),
                     ),
                   ),
                 ],

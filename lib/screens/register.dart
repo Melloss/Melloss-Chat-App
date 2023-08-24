@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:melloss_chat_app/screens/chat.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/circular_button.dart';
 import '../widgets/text_field.dart';
@@ -18,6 +17,8 @@ class _RegisterState extends State<Register> {
   final _auth = FirebaseAuth.instance;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  String emailError = '';
+  String passwordError = '';
 
   @override
   void dispose() {
@@ -47,11 +48,32 @@ class _RegisterState extends State<Register> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             buildTextField(context, emailController, 'Email...',
-                onChanged: (value) {},
+                onChanged: (value) {
+              emailError = '';
+              if (!value.isEmail) {
+                emailError = 'Email is Not Valid';
+              }
+              if (value.isEmpty) {
+                emailError = 'Email is Empty';
+              }
+            },
                 textAlign: TextAlign.center,
-                keyboardType: TextInputType.emailAddress),
+                keyboardType: TextInputType.emailAddress,
+                errorText: emailError == '' ? null : emailError),
             buildTextField(context, passwordController, 'Password...',
-                onChanged: (value) {}, textAlign: TextAlign.center),
+                onChanged: (value) {
+              passwordError = '';
+
+              if (value.length < 6) {
+                passwordError =
+                    'Password must be greater than or Equal to 6 character';
+              }
+              if (value.isEmpty) {
+                passwordError = 'Password is Empty';
+              }
+            },
+                textAlign: TextAlign.center,
+                errorText: passwordError == '' ? null : passwordError),
             const SizedBox(height: 40),
             showLoading == true
                 ? const CircularProgressIndicator()
@@ -71,13 +93,26 @@ class _RegisterState extends State<Register> {
                         if (newUser.additionalUserInfo!.isNewUser) {
                           final pref = await SharedPreferences.getInstance();
                           pref.setBool('isLoggedBefore', true);
-                          Get.to(() => const Chat());
+                          Get.offNamed('/chat');
                           emailController.text = '';
                           passwordController.text = '';
                         } else {
                           //
                         }
                       }
+                      setState(() {
+                        showLoading = false;
+                      });
+                    } on FirebaseException catch (e) {
+                      Get.snackbar(
+                        'Error',
+                        e.message!,
+                        snackPosition: SnackPosition.BOTTOM,
+                        colorText: Colors.white,
+                        backgroundColor: Colors.black54,
+                        margin: const EdgeInsets.all(10),
+                        duration: const Duration(seconds: 3),
+                      );
                       setState(() {
                         showLoading = false;
                       });
@@ -92,6 +127,9 @@ class _RegisterState extends State<Register> {
                         duration: const Duration(seconds: 3),
                       );
                     }
+                    setState(() {
+                      showLoading = false;
+                    });
                   })
           ],
         ),
