@@ -1,16 +1,15 @@
-# melloss_chat_app
+# Melloss Chat
 
-A new Flutter project.
+Melloss Chat is my first simple Group Chat Application.
 
-## Getting Started
+first time it looks like this
+![Uploading Screenshot_20230824_204011_com.example.melloss_chat_app.jpg…]()
 
-This project is a starting point for a Flutter application.
+after you signup or login you go to Chat Screen
+![Screenshot_20230824_204131_com example melloss_chat_app](https://github.com/Melloss/Melloss-Chat-App/assets/101984338/699de564-9acd-4e49-a8c8-d15fc9494e4b)
 
-A few resources to get you started if this is your first Flutter project:
+you can see the sender of the message by clicking the cirlcle profile
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+you can delete message by long press on the chat you want to delete
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ofcourse you can logout once you logged in.
